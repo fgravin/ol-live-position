@@ -1,0 +1,23 @@
+{
+  "name": "adl-poc-ol-live-position",
+  "version": "1.0.0",
+  "description": "POC to show live update position with Openlayers",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-command": "^0.5.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "geojson-random": "^0.5.0",
+    "ol": "^6.3.1"
+  }
+}
