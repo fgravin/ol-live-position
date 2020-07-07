@@ -10,9 +10,10 @@ import VectorLayer from 'ol/layer/Vector'
 import {Circle, RegularShape} from 'ol/style'
 import Fill from 'ol/style/Fill'
 import Style from 'ol/style/Style'
+import Stroke from 'ol/style/Stroke'
 
 const FEATURE_COUNT = 50
-const INTERVAL_TIME = 2000
+const INTERVAL_TIME = 5000
 
 let startAnimation
 
@@ -38,7 +39,20 @@ const agentsLayer = new VectorLayer({
   source: new VectorSource({
     features: agentPositions.getPositions(),
   }),
-  disableHitDetection: true
+  disableHitDetection: true,
+/*
+  style: new Style({
+    image: new Circle({
+      stroke: new Stroke({
+        color: 'rgba(0,0,255,1)',
+        width: 1
+      }),
+      fill: new Fill({
+        color: 'rgba(255,255,255,0.1)'
+      })
+    })
+  })
+*/
 })
 
 
@@ -59,7 +73,6 @@ ctx.drawImage(c2, 0,0, image.width, image.height, 6, 0, image.width-12, image.he
 
 const agentsLayerStyle = new Style({
   // image: triangle
-
   image: new Circle({
     fill: new Fill({color: 'red'}),
     radius: 5
