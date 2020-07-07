@@ -7,7 +7,7 @@ import {Position} from './position'
 import {getVectorContext} from 'ol/render'
 import Point from 'ol/geom/Point'
 import VectorLayer from 'ol/layer/Vector'
-import {Circle} from 'ol/style'
+import {Circle, RegularShape} from 'ol/style'
 import Fill from 'ol/style/Fill'
 import Style from 'ol/style/Style'
 
@@ -41,11 +41,30 @@ const agentsLayer = new VectorLayer({
   disableHitDetection: true
 })
 
+
+// Enlarge triangle to give direction
+const triangle = new RegularShape({
+  fill: new Fill({color: 'red'}),
+  points: 3,
+  radius: 14,
+})
+const image = triangle.getImage();
+const ctx = image.getContext("2d");
+const c2 = document.createElement('canvas');
+c2.width = c2.height = image.width;
+c2.getContext("2d").drawImage(image, 0,0);
+ctx.clearRect(0,0,image.width,image.height);
+ctx.drawImage(c2, 0,0, image.width, image.height, 6, 0, image.width-12, image.height);
+
+
 const agentsLayerStyle = new Style({
+  // image: triangle
+
   image: new Circle({
     fill: new Fill({color: 'red'}),
     radius: 5
   })
+
 })
 
 map.addLayer(agentsLayer)
@@ -59,16 +78,20 @@ agentsLayer.on('postrender', (event) => {
   layer.getSource().forEachFeature(feature => {
     if(startAnimation != undefined) {
       const timeRatio = (frameState.time - startAnimation) / INTERVAL_TIME
-      const newCoord = feature.getGeometry().getCoordinates()
-      const lastCoord = feature.get('lastCoord')
+      const p1 = feature.getGeometry().getCoordinates()
+      const p0 = feature.get('lastCoord')
 
-      const dX = newCoord[0] - lastCoord[0]
-      const dY = newCoord[1] - lastCoord[1]
+      const dX = p1[0] - p0[0]
+      const dY = p1[1] - p0[1]
 
       const newPos = [
-        dX * timeRatio + lastCoord[0],
-        dY * timeRatio + lastCoord[1],
+        dX * timeRatio + p0[0],
+        dY * timeRatio + p0[1],
       ]
+
+      const rotation = Math.PI/2 + Math.atan2(p0[1] - p1[1], p0[0] - p1[0])
+      agentsLayerStyle.getImage().setRotation( -rotation)
+
       vectorContext.setStyle(agentsLayerStyle)
       vectorContext.drawGeometry(new Point(newPos))
     }
