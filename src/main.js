@@ -10,7 +10,6 @@ import VectorLayer from 'ol/layer/Vector'
 import {Circle, RegularShape} from 'ol/style'
 import Fill from 'ol/style/Fill'
 import Style from 'ol/style/Style'
-import Stroke from 'ol/style/Stroke'
 
 const FEATURE_COUNT = 50
 const INTERVAL_TIME = 2000
@@ -41,23 +40,11 @@ const agentsLayer = new VectorLayer({
     features: agentPositions.getPositions(),
   }),
   disableHitDetection: true,
-  /*
-    style: new Style({
-      image: new Circle({
-        stroke: new Stroke({
-          color: 'rgba(0,0,255,1)',
-          width: 1
-        }),
-        fill: new Fill({
-          color: 'rgba(255,255,255,0.1)'
-        })
-      })
-    })
-  */
 })
 
 
 // Enlarge triangle to give direction
+// *** Not used now
 const triangle = new RegularShape({
   fill: new Fill({color: 'red'}),
   points: 3,
@@ -70,7 +57,7 @@ c2.width = c2.height = image.width
 c2.getContext('2d').drawImage(image, 0, 0)
 ctx.clearRect(0, 0, image.width, image.height)
 ctx.drawImage(c2, 0, 0, image.width, image.height, 6, 0, image.width - 12, image.height)
-
+// ***
 
 const agentsLayerStylePoint = new Style({
   image: new Circle({
@@ -84,11 +71,10 @@ const traineeStyle = new Style({
     radius: POINT_RADIUS
   })
 })
-
 const traineeStyle2 = new Style({
   image: new Circle({
     fill: new Fill({color: 'rgba(100,100,100,.7)'}),
-    radius: POINT_RADIUS-2
+    radius: POINT_RADIUS - 1
   })
 })
 
@@ -98,8 +84,8 @@ const agentsLayerStyleTriangle = new Style({
 
 map.addLayer(agentsLayer)
 
+// Compute animation on each frame
 agentsLayer.on('postrender', (event) => {
-
   const vectorContext = getVectorContext(event)
   const frameState = event.frameState
   const layer = event.target
@@ -118,15 +104,17 @@ agentsLayer.on('postrender', (event) => {
         dY * timeRatio + p0[1],
       ]
 
-      //const speed = Math.sqrt(dX*dX+dY*dY) / (INTERVAL_TIME / 3600)
+      // draw trainee
       const steps = [5, 10, 15, 25, 40, 60]
       vectorContext.setStyle(traineeStyle)
       steps.forEach(ratio => {
-        if(ratio >= 15) {
+        if (ratio >= 15) {
           vectorContext.setStyle(traineeStyle2)
         }
-        vectorContext.drawGeometry(new Point([newPos[0] - (dX * ratio/100), newPos[1] - (dY * ratio/100)]))
-        })
+        vectorContext.drawGeometry(new Point([newPos[0] - (dX * ratio / 100), newPos[1] - (dY * ratio / 100)]))
+      })
+
+      // Rotation used only for triangle
       const rotation = Math.PI / 2 + Math.atan2(p0[1] - p1[1], p0[0] - p1[0])
       agentsLayerStylePoint.getImage().setRotation(-rotation)
 
